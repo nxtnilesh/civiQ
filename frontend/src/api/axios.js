@@ -5,11 +5,12 @@ const api = axios.create({
 });
 
 // Add a request interceptor to include the auth token
-api.interceptors.request.use((config) => {
-  const userInfo = localStorage.getItem('userInfo');
-  if (userInfo) {
-    const { token } = JSON.parse(userInfo);
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(async (config) => {
+  if (window.Clerk && window.Clerk.session) {
+    const token = await window.Clerk.session.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 }, (error) => {

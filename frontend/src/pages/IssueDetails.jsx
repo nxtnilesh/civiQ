@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AuthContext } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import api from '../api/axios';
 import { MapPin, Clock, MessageSquare, ThumbsUp, User, ArrowLeft, Send } from 'lucide-react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
@@ -23,7 +23,7 @@ export default function IssueDetails() {
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [error, setError] = useState('');
-  const { user } = useContext(AuthContext);
+  const { user } = useUser();
 
   const [users, setUsers] = useState([]);
 
@@ -49,7 +49,7 @@ export default function IssueDetails() {
 
   useEffect(() => {
     fetchIssue();
-    if (user && user.role === 'authority') {
+    if (user && user.publicMetadata?.role === 'authority') {
       fetchUsers();
     }
   }, [id, user]);
@@ -68,7 +68,7 @@ export default function IssueDetails() {
     e.preventDefault();
     if (!commentText.trim()) return;
     try {
-      await api.post(`/issues/${id}/comments`, { text: commentText });
+      await api.post(`/issues/${id}/comments`, { text: commentText, userName: user.fullName || user.username || 'User' });
       setCommentText('');
       fetchIssue();
     } catch (err) {
@@ -115,9 +115,9 @@ export default function IssueDetails() {
     );
   }
 
-  const isUpvoted = user && issue.upvotes.includes(user._id);
-  const isAdmin = user && user.role === 'authority';
-  const isAssignedToMe = user && issue.assignedTo && issue.assignedTo._id === user._id;
+  const isUpvoted = user && issue.upvotes.includes(user.id);
+  const isAdmin = user && user.publicMetadata?.role === 'authority';
+  const isAssignedToMe = user && issue.assignedToId === user.id;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -155,12 +155,12 @@ export default function IssueDetails() {
               <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-500 font-medium mb-8">
                 <div className="flex items-center gap-1.5">
                   <User className="w-4 h-4 text-gray-400" />
-                  <span className="font-bold">Reported by:</span> {issue.author.username}
+                  <span className="font-bold">Reported by:</span> {issue.authorName}
                 </div>
-                {issue.assignedTo && (
+                {issue.assignedToName && (
                   <div className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
                     <User className="w-4 h-4" />
-                    <span className="font-bold">Assigned to:</span> {issue.assignedTo.username}
+                    <span className="font-bold">Assigned to:</span> {issue.assignedToName}
                   </div>
                 )}
                 <div className="flex items-center gap-1.5">
@@ -225,11 +225,11 @@ export default function IssueDetails() {
                 issue.comments.map((comment, i) => (
                   <div key={i} className="flex gap-4">
                     <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center font-bold text-lg flex-shrink-0">
-                      {comment.user.username.charAt(0).toUpperCase()}
+                      {comment.userName ? comment.userName.charAt(0).toUpperCase() : 'U'}
                     </div>
                     <div className="bg-gray-50 p-4 rounded-2xl rounded-tl-none border border-gray-100 flex-grow">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-gray-900">{comment.user.username}</span>
+                        <span className="font-bold text-gray-900">{comment.userName}</span>
                         <span className="text-xs text-gray-500">{new Date(comment.date).toLocaleDateString()}</span>
                       </div>
                       <p className="text-gray-600">{comment.text}</p>

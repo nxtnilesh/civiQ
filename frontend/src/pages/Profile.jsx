@@ -1,5 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+import { useUser } from '@clerk/clerk-react';
 import api from '../api/axios';
 import { User, Clock, CheckCircle, AlertCircle, MapPin, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,7 +62,7 @@ const ProgressStepper = ({ status }) => {
 }
 
 export default function Profile() {
-  const { user } = useContext(AuthContext);
+  const { user } = useUser();
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reviewModal, setReviewModal] = useState(null); 
@@ -107,8 +107,8 @@ export default function Profile() {
           <User className="w-10 h-10 md:w-12 md:h-12" />
         </div>
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">{user?.username}</h1>
-          <p className="text-gray-500 font-medium text-sm md:text-base">{user?.email}</p>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-gray-900">{user?.fullName || user?.username || 'Citizen'}</h1>
+          <p className="text-gray-500 font-medium text-sm md:text-base">{user?.primaryEmailAddress?.emailAddress}</p>
           <div className="mt-2 text-xs md:text-sm font-bold text-primary bg-primary-50 px-3 py-1 rounded-full w-max">
             {issues.length} Issues Reported
           </div>

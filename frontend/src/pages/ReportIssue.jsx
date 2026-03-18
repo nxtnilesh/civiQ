@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { AuthContext } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Upload, CheckCircle, FileText, ImagePlus, AlertCircle, ThumbsUp, Layers, MousePointerClick, MapPin, LocateFixed } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
@@ -41,7 +41,7 @@ export default function ReportIssue() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const { user } = useContext(AuthContext);
+  const { user } = useUser();
   const navigate = useNavigate();
 
   // Map components
@@ -156,7 +156,8 @@ export default function ReportIssue() {
         location: formData.location || 'Location Not Specified', // Optional from UI
         lat,
         lng,
-        imageUrl
+        imageUrl,
+        authorName: user?.fullName || user?.username || 'Citizen'
       });
 
       navigate('/dashboard');

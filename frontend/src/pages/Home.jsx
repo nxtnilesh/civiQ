@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import api from '../api/axios';
 import { MapPin, AlertTriangle, CheckCircle, ArrowRight, Shield, Zap, Droplet, Trash2, Users, Activity, Target, X, ThumbsUp } from 'lucide-react';
 
@@ -121,7 +121,7 @@ const staggerContainer = {
 export default function Home() {
   const [showIntro, setShowIntro] = useState(false);
   const [topIssues, setTopIssues] = useState([]);
-  const { user } = useContext(AuthContext);
+  const { user } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function Home() {
         // Filter out issues the user has already supported or completely skipped/swiped
         let pendingIssues = data.filter(issue => {
           if (actedIssues.includes(issue._id)) return false;
-          if (user && issue.upvotes.includes(user._id)) return false;
+          if (user && issue.upvotes.includes(user.id)) return false;
           return true;
         });
 
@@ -180,7 +180,7 @@ export default function Home() {
     }
 
     try {
-      if (!issue.upvotes.includes(user._id)) {
+      if (!issue.upvotes.includes(user.id)) {
         await api.put(`/issues/${issue._id}/upvote`);
       }
     } catch (error) {

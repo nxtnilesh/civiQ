@@ -1,11 +1,12 @@
 const Issue = require('../models/Issue');
+const { getAuth } = require('@clerk/express')
 
 // @desc    Get all issues
 // @route   GET /api/issues
 // @access  Public
 const getIssues = async (req, res) => {
     try {
-        const issues = await Issue.find().populate('author', 'username email').sort({ createdAt: -1 });
+        const issues = await Issue.find().sort({ createdAt: -1 });
         res.status(200).json(issues);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -17,11 +18,8 @@ const getIssues = async (req, res) => {
 // @access  Public
 const getIssueById = async (req, res) => {
     try {
-        const issue = await Issue.findById(req.params.id)
-            .populate('author', 'username email')
-            .populate('assignedTo', 'username email')
-            .populate('comments.user', 'username');
-            
+        const issue = await Issue.findById(req.params.id);
+
         if (issue) {
             res.status(200).json(issue);
         } else {
@@ -36,8 +34,10 @@ const getIssueById = async (req, res) => {
 // @route   POST /api/issues
 // @access  Private
 const createIssue = async (req, res) => {
+    const { userId } = getAuth(req)
+    // console.log("userId", userId);
     try {
-        const { title, description, category, subCategory, location, imageUrl, lat, lng } = req.body;
+        const { title, description, category, subCategory, location, imageUrl, lat, lng, authorName } = req.body;
 
         const issue = await Issue.create({
             title,
@@ -48,7 +48,8 @@ const createIssue = async (req, res) => {
             lat,
             lng,
             imageUrl,
-            author: req.user._id
+            authorId: userId, // need to write logic for this
+            authorName: authorName || 'Anonymous Citizen'
         });
 
         res.status(201).json(issue);
@@ -62,32 +63,19 @@ const createIssue = async (req, res) => {
 // @access  Private/Admin
 const updateIssueStatus = async (req, res) => {
     try {
-        const { status, assignedTo } = req.body;
+        const { status, assignedToId, assignedToName } = req.body;
         const issue = await Issue.findById(req.params.id);
 
         if (issue) {
-            const isAdmin = req.user && req.user.role === 'authority';
-            const isAssigned = issue.assignedTo && req.user && issue.assignedTo.toString() === req.user._id.toString();
-
-            if (!isAdmin && !isAssigned) {
-                return res.status(401).json({ message: 'Not authorized to update this issue status' });
-            }
-
             if (status) issue.status = status;
-            
-            if (assignedTo !== undefined && isAdmin) {
-                issue.assignedTo = assignedTo || null;
+
+            if (assignedToId) {
+                issue.assignedToId = assignedToId;
+                issue.assignedToName = assignedToName;
             }
 
             const updatedIssue = await issue.save();
-            
-            // Return fully populated issue to reflect the changes immediately
-            const populatedIssue = await Issue.findById(updatedIssue._id)
-                .populate('author', 'username email')
-                .populate('assignedTo', 'username email')
-                .populate('comments.user', 'username');
-
-            res.status(200).json(populatedIssue);
+            res.status(200).json(updatedIssue);
         } else {
             res.status(404).json({ message: 'Issue not found' });
         }
@@ -104,12 +92,12 @@ const upvoteIssue = async (req, res) => {
         const issue = await Issue.findById(req.params.id);
 
         if (issue) {
-            const alreadyUpvoted = issue.upvotes.includes(req.user._id);
+            const userId = req.auth.userId;
+            const alreadyUpvoted = issue.upvotes.includes(userId);
             if (alreadyUpvoted) {
-                // Optionally allow removing upvote
-                issue.upvotes = issue.upvotes.filter(id => id.toString() !== req.user._id.toString());
+                issue.upvotes = issue.upvotes.filter(id => id !== userId);
             } else {
-                issue.upvotes.push(req.user._id);
+                issue.upvotes.push(userId);
             }
             await issue.save();
             res.status(200).json(issue);
@@ -126,12 +114,13 @@ const upvoteIssue = async (req, res) => {
 // @access  Private
 const addComment = async (req, res) => {
     try {
-        const { text } = req.body;
+        const { text, userName } = req.body;
         const issue = await Issue.findById(req.params.id);
 
         if (issue) {
             const comment = {
-                user: req.user._id,
+                userId: req.auth.userId,
+                userName: userName || 'User',
                 text
             };
             issue.comments.push(comment);
@@ -150,7 +139,7 @@ const addComment = async (req, res) => {
 // @access  Private
 const getUserIssues = async (req, res) => {
     try {
-        const issues = await Issue.find({ author: req.user._id }).populate('author', 'username email').sort({ createdAt: -1 });
+        const issues = await Issue.find({ authorId: req.auth.userId }).sort({ createdAt: -1 });
         res.status(200).json(issues);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -166,8 +155,8 @@ const reviewIssue = async (req, res) => {
         const issue = await Issue.findById(req.params.id);
 
         if (!issue) return res.status(404).json({ message: 'Issue not found' });
-        
-        if (issue.author.toString() !== req.user._id.toString()) {
+
+        if (issue.authorId !== req.auth.userId) {
             return res.status(401).json({ message: 'User not authorized to review this issue' });
         }
 
@@ -176,7 +165,7 @@ const reviewIssue = async (req, res) => {
         }
 
         if (issue.resolutionReview && issue.resolutionReview.rating) {
-             return res.status(400).json({ message: 'Issue already reviewed' });
+            return res.status(400).json({ message: 'Issue already reviewed' });
         }
 
         issue.resolutionReview = {

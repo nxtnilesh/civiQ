@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import api from '../api/axios';
 import { MapPin, Clock, MessageSquare, ThumbsUp, Map as MapIcon, List } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -48,7 +48,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
-  const { user } = useContext(AuthContext);
+  const { user } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -205,9 +205,9 @@ export default function Dashboard() {
                   <div className="flex gap-4">
                     <button 
                       onClick={(e) => handleSupport(e, issue._id)}
-                      className={`flex items-center gap-1.5 text-sm font-bold transition-colors hover:scale-105 active:scale-95 ${user && issue.upvotes.includes(user._id) ? 'text-secondary' : 'text-gray-500 hover:text-green-600'}`}
+                      className={`flex items-center gap-1.5 text-sm font-bold transition-colors hover:scale-105 active:scale-95 ${user && issue.upvotes.includes(user.id) ? 'text-secondary' : 'text-gray-500 hover:text-green-600'}`}
                     >
-                      <ThumbsUp className={`w-4 h-4 ${user && issue.upvotes.includes(user._id) ? 'fill-secondary' : ''}`} /> {issue.upvotes?.length || 0}
+                      <ThumbsUp className={`w-4 h-4 ${user && issue.upvotes.includes(user.id) ? 'fill-secondary' : ''}`} /> {issue.upvotes?.length || 0}
                     </button>
                     <div className="flex items-center gap-1.5 text-gray-500 text-sm font-medium">
                       <MessageSquare className="w-4 h-4" /> {issue.comments?.length || 0}

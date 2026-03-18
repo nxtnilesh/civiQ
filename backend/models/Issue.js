@@ -40,24 +40,28 @@ const issueSchema = new mongoose.Schema({
         enum: ['Pending', 'Assigned', 'Inspect', 'In Progress', 'Resolved'],
         default: 'Pending'
     },
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        required: true,
-        ref: 'User'
+    authorId: {
+        type: String,
+        required: true
     },
-    assignedTo: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+    authorName: {
+        type: String,
+        required: true
+    },
+    assignedToId: {
+        type: String
+    },
+    assignedToName: {
+        type: String
     },
     upvotes: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        type: String
     }],
     comments: [{
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
+        userId: {
+            type: String
         },
+        userName: String,
         text: String,
         date: {
             type: Date,

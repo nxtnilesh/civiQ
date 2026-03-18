@@ -1,15 +1,12 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { SignedIn, SignedOut, UserButton, useUser, useAuth } from '@clerk/clerk-react';
 import { Home, Map as MapIcon, PlusCircle, LogIn, UserPlus, LogOut, Menu, X, HelpCircle, Shield } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, dispatch } = useContext(AuthContext);
+  const { isSignedIn, user } = useUser();
+  const { signOut } = useAuth();
   const location = useLocation();
-
-  const handleLogout = () => {
-    dispatch({ type: 'LOGOUT' });
-  };
 
   const isActive = (path) => location.pathname === path;
 
@@ -28,39 +25,32 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-8">
               <Link to="/" className={`font-medium text-sm transition-colors ${isActive('/') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Home</Link>
               <Link to="/dashboard" className={`font-medium text-sm transition-colors ${isActive('/dashboard') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Dashboard</Link>
-              {user ? (
-                <>
+              <SignedIn>
                   <Link to="/report" className={`font-medium text-sm transition-colors ${isActive('/report') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Report Issue</Link>
                   <Link to="/profile" className={`font-medium text-sm transition-colors ${isActive('/profile') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Profile</Link>
                   <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
-                    <span className="text-sm font-bold text-primary bg-primary-50 px-3 py-1.5 rounded-full border border-primary-200">
-                      {user.username}
-                    </span>
-                    <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors">
-                      <LogOut className="w-4 h-4" /> Logout
-                    </button>
+                    <UserButton />
                   </div>
-                </>
-              ) : (
+              </SignedIn>
+              <SignedOut>
                 <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
                   <Link to="/login" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">Login</Link>
                   <Link to="/register" className="text-sm font-bold bg-primary text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors shadow-sm">Sign Up</Link>
                 </div>
-              )}
+              </SignedOut>
             </div>
 
             {/* Mobile Top Actions (Logout/Login) */}
             <div className="md:hidden flex items-center gap-3">
-               {user ? (
-                 <button onClick={handleLogout} className="text-sm font-medium border border-gray-200 text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center gap-1">
-                    <LogOut className="w-4 h-4" /> <span className="text-xs">Out</span>
-                 </button>
-               ) : (
+               <SignedIn>
+                 <UserButton />
+               </SignedIn>
+               <SignedOut>
                  <div className="flex gap-2">
                    <Link to="/login" className="text-xs font-bold bg-gray-100 text-gray-700 px-3 py-1.5 rounded-lg transition-colors shadow-sm border border-gray-200">Log In</Link>
                    <Link to="/register" className="text-xs font-bold bg-primary text-white px-3 py-1.5 rounded-lg transition-colors shadow-sm">Sign Up</Link>
                  </div>
-               )}
+               </SignedOut>
             </div>
           </div>
         </div>
@@ -87,9 +77,9 @@ export default function Navbar() {
             </Link>
           </div>
           
-          <Link to={user ? "/profile" : "/login"} className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/profile') ? 'text-primary' : 'text-gray-500 active:text-gray-900'}`}>
+          <Link to={isSignedIn ? "/profile" : "/login"} className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/profile') ? 'text-primary' : 'text-gray-500 active:text-gray-900'}`}>
              <UserPlus className={`w-6 h-6 ${isActive('/profile') ? 'fill-primary/20' : ''}`} />
-             <span className="text-[10px] font-medium">{user ? "Profile" : "Login"}</span>
+             <span className="text-[10px] font-medium">{isSignedIn ? "Profile" : "Login"}</span>
           </Link>
           <button onClick={() => {}} className="w-full h-full flex flex-col gap-1 items-center justify-center text-gray-500 active:text-gray-900">
              <Menu className="w-6 h-6" />
