@@ -281,7 +281,7 @@ export default function Home() {
             initial="hidden"
             animate="visible"
             variants={fadeInUp}
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-white tracking-tight leading-tight max-w-5xl"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight max-w-5xl"
           >
             Empowering Citizens to <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary via-accent to-primary">Improve Our City</span>
@@ -320,30 +320,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-gray-50 relative z-10 -mt-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {stats.map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white rounded-2xl p-6 flex flex-col items-center justify-center shadow-lg border border-gray-100 shadow-gray-200/50 hover:-translate-y-1 transition-transform"
-              >
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary mb-3">
-                  {stat.icon}
-                </div>
-                <div className="text-4xl font-extrabold text-gray-900 mb-1">{stat.value}</div>
-                <div className="text-gray-500 font-medium">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Features Section */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -375,6 +351,30 @@ export default function Home() {
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-12 bg-gray-50 relative z-10 -mt-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white rounded-2xl p-6 flex flex-col items-center justify-center shadow-lg border border-gray-100 shadow-gray-200/50 hover:-translate-y-1 transition-transform"
+              >
+                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary mb-3">
+                  {stat.icon}
+                </div>
+                <div className="text-4xl font-extrabold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-gray-500 font-medium">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
