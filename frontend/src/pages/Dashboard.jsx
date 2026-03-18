@@ -171,7 +171,7 @@ export default function Dashboard() {
             >
               <Link to={`/issue/${issue._id}`} className="block h-48 w-full overflow-hidden relative">
                 {issue.imageUrl ? (
-                  <img src={`http://localhost:5000${issue.imageUrl}`} alt={issue.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img src={issue.imageUrl.startsWith('http') ? issue.imageUrl : `http://localhost:5000${issue.imageUrl}`} alt={issue.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 ) : (
                   <div className="h-full w-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
                     <span className="text-gray-400 font-medium">No Image Provided</span>

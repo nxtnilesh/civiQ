@@ -129,8 +129,8 @@ export default function Profile() {
             <motion.div key={issue._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-md border border-gray-100 flex flex-col overflow-hidden">
               <div className="p-5 md:p-6 pb-2 flex flex-col md:flex-row gap-6">
                 {issue.imageUrl && (
-                  <div className="w-full md:w-48 h-32 rounded-xl overflow-hidden flex-shrink-0">
-                    <img src={`http://localhost:5000${issue.imageUrl}`} alt="Issue" className="w-full h-full object-cover" />
+                  <div className="h-40 w-full mb-4 rounded-xl overflow-hidden">
+                    <img src={issue.imageUrl.startsWith('http') ? issue.imageUrl : `http://localhost:5000${issue.imageUrl}`} alt="Issue" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="flex-grow flex flex-col justify-center">

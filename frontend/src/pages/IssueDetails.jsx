@@ -134,8 +134,8 @@ export default function IssueDetails() {
             className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
           >
             {issue.imageUrl && (
-              <div className="w-full h-72 md:h-96 relative">
-                <img src={`http://localhost:5000${issue.imageUrl}`} alt={issue.title} className="w-full h-full object-cover" />
+              <div className="h-64 sm:h-96 w-full relative">
+                <img src={issue.imageUrl.startsWith('http') ? issue.imageUrl : `http://localhost:5000${issue.imageUrl}`} alt={issue.title} className="w-full h-full object-cover" />
               </div>
             )}
             

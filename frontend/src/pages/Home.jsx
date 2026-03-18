@@ -48,7 +48,7 @@ const SwipeableCard = ({ issue, isTop, onSwipeRight, onSwipeLeft, index, total }
 
       <div className="w-full h-[55%] relative bg-gray-200 pointer-events-none select-none">
         {issue.imageUrl ? (
-          <img src={`http://localhost:5000${issue.imageUrl}`} draggable={false} className="w-full h-full object-cover" />
+          <img src={issue.imageUrl.startsWith('http') ? issue.imageUrl : `http://localhost:5000${issue.imageUrl}`} draggable={false} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
             <AlertTriangle className="w-10 h-10 mb-2 opacity-50" />
