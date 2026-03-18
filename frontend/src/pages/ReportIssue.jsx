@@ -191,7 +191,7 @@ export default function ReportIssue() {
                   </button>
                 </div>
                 <div className="h-44 rounded-xl overflow-hidden border border-gray-200 z-0 relative">
-                  <MapContainer center={[40.7128, -74.0060]} zoom={13} scrollWheelZoom={true} className="h-full w-full relative z-0">
+                  <MapContainer center={[20.5937, 78.9629]} zoom={5} scrollWheelZoom={true} className="h-full w-full relative z-0">
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />

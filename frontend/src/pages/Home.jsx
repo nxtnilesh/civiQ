@@ -55,7 +55,7 @@ export default function Home() {
       <section className="relative min-h-[90vh] flex items-center justify-center bg-gray-900 overflow-hidden pt-16">
         {/* Background Elements */}
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center object-cover mix-blend-overlay opacity-40" />
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1566552881560-0be862a7c445?auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center object-cover mix-blend-overlay opacity-40" />
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-purple-600/30 mix-blend-multiply" />
         </div>
@@ -206,7 +206,7 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="relative py-24 bg-primary overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517737282201-f2f2ac6c0e5a?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-multiply opacity-20" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1587474260580-589f81d596ea?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center mix-blend-multiply opacity-20" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white">
           <h2 className="text-4xl md:text-5xl font-extrabold mb-6">Ready to see a change?</h2>
           <p className="text-xl text-primary-100 mb-10 font-light">Join thousands of citizens who are actively making their neighborhoods cleaner, safer, and better for everyone.</p>

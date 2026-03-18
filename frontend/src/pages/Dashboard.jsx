@@ -117,13 +117,13 @@ export default function Dashboard() {
         </div>
       ) : viewMode === 'map' ? (
         <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 relative z-0">
-          <MapContainer center={[40.7128, -74.0060]} zoom={12} className="h-full w-full z-0">
+          <MapContainer center={[20.5937, 78.9629]} zoom={5} className="h-full w-full z-0">
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
             {filteredIssues.map((issue, i) => {
               // If issue doesn't have valid coordinates, assign a random offset around default center for display purposes
               const pos = (issue.lat && issue.lng && issue.lat !== 0) 
                  ? [issue.lat, issue.lng] 
-                 : [40.7128 + (i * 0.01), -74.0060 + (i * 0.01)]; // simple predictable offset
+                 : [20.5937 + (i * 0.1), 78.9629 + (i * 0.1)]; // simple predictable offset
               return (
               <Marker key={issue._id} position={pos} icon={getCategoryIcon(issue.category)}>
                 <Popup>
