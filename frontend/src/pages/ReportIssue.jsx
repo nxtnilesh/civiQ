@@ -186,7 +186,7 @@ export default function ReportIssue() {
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                     <MapPin className="w-4 h-4 text-primary" /> Pinpoint on Map (Required)
                   </label>
-                  <button type="button" onClick={handleGeolocation} className="text-xs font-bold text-primary hover:text-indigo-600 bg-primary/10 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
+                  <button type="button" onClick={handleGeolocation} className="text-xs font-bold text-primary hover:text-green-600 bg-primary/10 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
                     <MapPin className="w-3 h-3" /> Use My Location
                   </button>
                 </div>
@@ -227,7 +227,7 @@ export default function ReportIssue() {
                       <>
                         <Camera className="mx-auto h-12 w-12 text-gray-400 group-hover:text-primary transition-colors" />
                         <div className="flex text-sm text-gray-600 justify-center">
-                          <span className="relative cursor-pointer rounded-md font-medium text-primary hover:text-indigo-500 focus-within:outline-none">
+                          <span className="relative cursor-pointer rounded-md font-medium text-primary hover:text-green-500 focus-within:outline-none">
                             Upload a file
                           </span>
                           <p className="pl-1">or drag and drop</p>
@@ -250,7 +250,7 @@ export default function ReportIssue() {
             <button 
               type="submit" 
               disabled={loading}
-              className="px-8 py-3 rounded-xl shadow-md text-sm font-bold text-white bg-primary hover:bg-indigo-600 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
+              className="px-8 py-3 rounded-xl shadow-md text-sm font-bold text-white bg-primary hover:bg-green-600 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
             >
               {loading ? 'Submitting...' : 'Submit Report'}
             </button>

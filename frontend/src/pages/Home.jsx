@@ -220,7 +220,7 @@ export default function Home() {
       <footer className="bg-gray-900 text-gray-400 py-12 text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Shield className="w-6 h-6 text-primary" />
-          <span className="text-2xl font-bold text-white tracking-tight">Civic<span className="text-primary">Voice</span></span>
+          <span className="text-2xl font-bold text-white tracking-tight">Civic<span className="text-primary">Q</span></span>
         </div>
         <p>© 2026 CiviQ Platform. Built for the community.</p>
       </footer>

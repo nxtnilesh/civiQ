@@ -83,10 +83,10 @@ export default function Dashboard() {
         
         <div className="flex flex-col sm:flex-row flex-wrap gap-4">
             <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
-              <button onClick={() => setViewMode('list')} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+              <button onClick={() => setViewMode('list')} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${viewMode === 'list' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
                 <List className="w-4 h-4" /> List
               </button>
-              <button onClick={() => setViewMode('map')} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${viewMode === 'map' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+              <button onClick={() => setViewMode('map')} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${viewMode === 'map' ? 'bg-green-50 text-green-700' : 'text-gray-600 hover:bg-gray-50'}`}>
                 <MapIcon className="w-4 h-4" /> Map
               </button>
             </div>
@@ -113,7 +113,7 @@ export default function Dashboard() {
         <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
           <h3 className="text-xl font-bold text-gray-900 mb-2">No issues found</h3>
           <p className="text-gray-500">There are no {filter !== 'All' ? filter.toLowerCase() : ''} issues reported yet.</p>
-          <Link to="/report" className="mt-6 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary hover:bg-indigo-600 shadow-md hover:shadow-lg transition-all">Report an issue now</Link>
+          <Link to="/report" className="mt-6 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary hover:bg-green-600 shadow-md hover:shadow-lg transition-all">Report an issue now</Link>
         </div>
       ) : viewMode === 'map' ? (
         <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 relative z-0">
@@ -192,7 +192,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   
-                  <Link to={`/issue/${issue._id}`} className="text-sm font-bold text-primary hover:text-indigo-600 transition-colors">
+                  <Link to={`/issue/${issue._id}`} className="text-sm font-bold text-primary hover:text-green-600 transition-colors">
                     View Details →
                   </Link>
                 </div>
