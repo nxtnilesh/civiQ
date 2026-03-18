@@ -27,7 +27,7 @@ export default function Navbar() {
               <Link to="/dashboard" className={`font-medium text-sm transition-colors ${isActive('/dashboard') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Dashboard</Link>
               <SignedIn>
                   <Link to="/report" className={`font-medium text-sm transition-colors ${isActive('/report') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Report Issue</Link>
-                  <Link to="/profile" className={`font-medium text-sm transition-colors ${isActive('/profile') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Profile</Link>
+                  {/* <Link to="/profile" className={`font-medium text-sm transition-colors ${isActive('/profile') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Profile</Link> */}
                   <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
                     <UserButton />
                   </div>

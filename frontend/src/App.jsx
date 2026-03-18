@@ -16,8 +16,8 @@ function App() {
         <main className="flex-grow w-full">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login/*" element={<Login />} />
+            <Route path="/register/*" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/report" element={<ReportIssue />} />
             <Route path="/issue/:id" element={<IssueDetails />} />

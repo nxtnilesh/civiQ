@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useUser } from '@clerk/clerk-react';
 import api from '../api/axios';
-import { MapPin, Clock, MessageSquare, ThumbsUp, Map as MapIcon, List } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, ThumbsUp, Map as MapIcon, List, Flame, ShieldAlert } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -81,7 +81,36 @@ export default function Dashboard() {
     }
   };
 
-  const filteredIssues = filter === 'All' ? issues : issues.filter(issue => issue.category === filter);
+  const isAdmin = user && user.publicMetadata?.role === 'authority';
+  const userDepartment = user && user.publicMetadata?.department;
+
+  const calculatePriority = (issue) => {
+    if (issue.status === 'Resolved') return 0;
+    
+    // Upvote points: 10 per upvote
+    const upvotesScore = (issue.upvotes?.length || 0) * 10;
+    
+    // Time delayed points: 2 per hour since creation
+    const hoursDelayed = Math.max(0, (new Date() - new Date(issue.createdAt)) / (1000 * 60 * 60));
+    const timeScore = hoursDelayed * 2;
+    
+    return Math.round(upvotesScore + timeScore);
+  };
+
+  const processedIssues = issues.map(issue => ({
+    ...issue,
+    priorityScore: calculatePriority(issue)
+  })).sort((a, b) => {
+    if (isAdmin) {
+      // Sort by priority descending for authorities
+      return b.priorityScore - a.priorityScore;
+    }
+    // Default sort by newest for citizens
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  const effectiveFilter = (isAdmin && userDepartment && userDepartment !== 'All') ? userDepartment : filter;
+  const filteredIssues = effectiveFilter === 'All' ? processedIssues : processedIssues.filter(issue => issue.category === effectiveFilter);
 
   const getStatusColor = (status) => {
     switch(status) {
@@ -96,8 +125,20 @@ export default function Dashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Civic Issues Explorer</h1>
-          <p className="mt-2 text-gray-600">Discover and track problems reported in your community.</p>
+          {(isAdmin && userDepartment) ? (
+             <>
+               <h1 className="text-3xl font-extrabold text-primary flex items-center gap-3 tracking-tight">
+                 <ShieldAlert className="w-8 h-8" />
+                 {userDepartment} Department Dashboard
+               </h1>
+               <p className="mt-2 text-gray-600 font-medium">Manage and resolve active '{userDepartment}' civic issues according to priority.</p>
+             </>
+          ) : (
+             <>
+               <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Civic Issues Explorer</h1>
+               <p className="mt-2 text-gray-600">Discover and track problems reported in your community.</p>
+             </>
+          )}
         </div>
         
         <div className="flex flex-col sm:flex-row flex-wrap gap-4">
@@ -110,8 +151,9 @@ export default function Dashboard() {
               </button>
             </div>
 
-            <div className="flex flex-wrap gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1.5">
-            {['All', 'Roads', 'Water', 'Electricity', 'Garbage', 'Others'].map(cat => (
+            {!(isAdmin && userDepartment) && (
+              <div className="flex flex-wrap gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1.5">
+              {['All', 'Roads', 'Water', 'Electricity', 'Garbage', 'Others'].map(cat => (
                 <button
                 key={cat}
                 onClick={() => setFilter(cat)}
@@ -119,8 +161,9 @@ export default function Dashboard() {
                 >
                 {cat}
                 </button>
-            ))}
-            </div>
+              ))}
+              </div>
+            )}
         </div>
       </div>
 
@@ -180,6 +223,12 @@ export default function Dashboard() {
                 <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-sm ${getStatusColor(issue.status)}`}>
                   {issue.status}
                 </div>
+                {isAdmin && issue.status !== 'Resolved' && (
+                  <div className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md shadow-sm bg-red-100 text-red-800 border-red-200 flex items-center gap-1.5 z-10 transition-transform hover:scale-105 cursor-help" title={`Priority Score: ${issue.priorityScore}`}>
+                    <Flame className="w-3.5 h-3.5" />
+                    Urgent {issue.priorityScore > 0 ? `(${issue.priorityScore})` : ''}
+                  </div>
+                )}
               </Link>
               
               <div className="p-6 flex flex-col flex-grow">
