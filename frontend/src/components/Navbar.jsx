@@ -32,7 +32,9 @@ export default function Navbar() {
                 <>
                   <Link to="/report" className={`font-medium text-sm transition-colors ${isActive('/report') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Report Issue</Link>
                   <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
-                    <span className="text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-full border border-gray-200">{user.username}</span>
+                    <Link to="/profile" className="text-sm font-bold text-primary hover:text-green-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-full border border-primary-200 transition-colors">
+                      {user.username}
+                    </Link>
                     <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors">
                       <LogOut className="w-4 h-4" /> Logout
                     </button>
@@ -84,8 +86,8 @@ export default function Navbar() {
             </Link>
           </div>
           
-          <Link to={user ? "/dashboard" : "/login"} className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/login') ? 'text-primary' : 'text-gray-500 active:text-gray-900'}`}>
-             <UserPlus className={`w-6 h-6`} />
+          <Link to={user ? "/profile" : "/login"} className={`flex flex-col items-center justify-center w-full h-full gap-1 ${isActive('/profile') ? 'text-primary' : 'text-gray-500 active:text-gray-900'}`}>
+             <UserPlus className={`w-6 h-6 ${isActive('/profile') ? 'fill-primary/20' : ''}`} />
              <span className="text-[10px] font-medium">{user ? "Profile" : "Login"}</span>
           </Link>
           <button onClick={() => {}} className="w-full h-full flex flex-col gap-1 items-center justify-center text-gray-500 active:text-gray-900">

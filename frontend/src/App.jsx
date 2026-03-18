@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import ReportIssue from './pages/ReportIssue';
 import IssueDetails from './pages/IssueDetails';
+import Profile from './pages/Profile';
 import Navbar from './components/Navbar';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/report" element={<ReportIssue />} />
             <Route path="/issue/:id" element={<IssueDetails />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
       </div>

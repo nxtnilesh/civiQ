@@ -124,11 +124,60 @@ const addComment = async (req, res) => {
     }
 };
 
+// @desc    Get logged in user issues
+// @route   GET /api/issues/my
+// @access  Private
+const getUserIssues = async (req, res) => {
+    try {
+        const issues = await Issue.find({ author: req.user._id }).populate('author', 'username email').sort({ createdAt: -1 });
+        res.status(200).json(issues);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Review a resolved issue
+// @route   POST /api/issues/:id/review
+// @access  Private
+const reviewIssue = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+        const issue = await Issue.findById(req.params.id);
+
+        if (!issue) return res.status(404).json({ message: 'Issue not found' });
+        
+        if (issue.author.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'User not authorized to review this issue' });
+        }
+
+        if (issue.status !== 'Resolved') {
+            return res.status(400).json({ message: 'Issue must be resolved before reviewing' });
+        }
+
+        if (issue.resolutionReview && issue.resolutionReview.rating) {
+             return res.status(400).json({ message: 'Issue already reviewed' });
+        }
+
+        issue.resolutionReview = {
+            rating: Number(rating),
+            comment,
+            createdAt: Date.now()
+        };
+
+        const updatedIssue = await issue.save();
+        res.status(201).json(updatedIssue);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     getIssues,
     getIssueById,
     createIssue,
     updateIssueStatus,
     upvoteIssue,
-    addComment
+    addComment,
+    getUserIssues,
+    reviewIssue
 };

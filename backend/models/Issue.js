@@ -55,7 +55,12 @@ const issueSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
-    }]
+    }],
+    resolutionReview: {
+        rating: { type: Number, min: 1, max: 5 },
+        comment: { type: String },
+        createdAt: { type: Date }
+    }
 }, {
     timestamps: true
 });
