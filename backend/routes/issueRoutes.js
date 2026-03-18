@@ -24,7 +24,7 @@ router.route('/:id')
     .get(getIssueById);
 
 router.route('/:id/status')
-    .put(protect, admin, updateIssueStatus);
+    .put(protect, updateIssueStatus);
 
 router.route('/:id/upvote')
     .put(protect, upvoteIssue);

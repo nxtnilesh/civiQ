@@ -25,6 +25,8 @@ export default function IssueDetails() {
   const [error, setError] = useState('');
   const { user } = useContext(AuthContext);
 
+  const [users, setUsers] = useState([]);
+
   const fetchIssue = async () => {
     try {
       const { data } = await api.get(`/issues/${id}`);
@@ -36,9 +38,21 @@ export default function IssueDetails() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const { data } = await api.get('/auth/users');
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users', error);
+    }
+  };
+
   useEffect(() => {
     fetchIssue();
-  }, [id]);
+    if (user && user.role === 'authority') {
+      fetchUsers();
+    }
+  }, [id, user]);
 
   const handleUpvote = async () => {
     if (!user) return alert('Please login to upvote');
@@ -68,6 +82,17 @@ export default function IssueDetails() {
       fetchIssue();
     } catch (err) {
       console.error(err);
+      alert(err.response?.data?.message || 'Error updating status');
+    }
+  };
+
+  const handleAssignChange = async (e) => {
+    try {
+      await api.put(`/issues/${id}/status`, { assignedTo: e.target.value || null, status: 'Assigned' });
+      fetchIssue();
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Error assigning user');
     }
   };
 
@@ -92,6 +117,7 @@ export default function IssueDetails() {
 
   const isUpvoted = user && issue.upvotes.includes(user._id);
   const isAdmin = user && user.role === 'authority';
+  const isAssignedToMe = user && issue.assignedTo && issue.assignedTo._id === user._id;
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -129,15 +155,17 @@ export default function IssueDetails() {
               <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-gray-500 font-medium mb-8">
                 <div className="flex items-center gap-1.5">
                   <User className="w-4 h-4 text-gray-400" />
-                  {issue.author.username}
+                  <span className="font-bold">Reported by:</span> {issue.author.username}
                 </div>
+                {issue.assignedTo && (
+                  <div className="flex items-center gap-1.5 text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+                    <User className="w-4 h-4" />
+                    <span className="font-bold">Assigned to:</span> {issue.assignedTo.username}
+                  </div>
+                )}
                 <div className="flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-gray-400" />
                   {new Date(issue.createdAt).toLocaleDateString()}
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-gray-400" />
-                  {issue.location}
                 </div>
               </div>
               
@@ -219,7 +247,7 @@ export default function IssueDetails() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {isAdmin && (
+          {(isAdmin || isAssignedToMe) && (
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -228,16 +256,35 @@ export default function IssueDetails() {
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                 Authority Area
               </h3>
+              
+              {isAdmin && (
+                <div className="space-y-3 mb-6">
+                  <label className="block text-sm font-medium text-gray-700">Assign Worker / Official</label>
+                  <select 
+                    value={issue.assignedTo?._id || ''} 
+                    onChange={handleAssignChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 transition-all outline-none bg-white font-medium shadow-sm"
+                  >
+                    <option value="">-- Unassigned --</option>
+                    {users.map(u => (
+                      <option key={u._id} value={u._id}>{u.username} ({u.role})</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="space-y-3">
-                <label className="block text-sm font-medium text-gray-700">Update Status</label>
+                <label className="block text-sm font-medium text-gray-700">Update Status Pipeline</label>
                 <select 
                   value={issue.status} 
                   onChange={handleStatusChange}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary transition-all outline-none bg-white font-medium shadow-sm"
                 >
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Resolved">Resolved</option>
+                  <option value="Pending">Pending Validation</option>
+                  <option value="Assigned">Assigned & Scheduled</option>
+                  <option value="Inspect">Inspection Phase</option>
+                  <option value="In Progress">Actively In Progress</option>
+                  <option value="Resolved">Resolved & Completed</option>
                 </select>
               </div>
             </motion.div>

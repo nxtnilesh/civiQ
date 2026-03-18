@@ -19,6 +19,7 @@ const getIssueById = async (req, res) => {
     try {
         const issue = await Issue.findById(req.params.id)
             .populate('author', 'username email')
+            .populate('assignedTo', 'username email')
             .populate('comments.user', 'username');
             
         if (issue) {
@@ -61,13 +62,32 @@ const createIssue = async (req, res) => {
 // @access  Private/Admin
 const updateIssueStatus = async (req, res) => {
     try {
-        const { status } = req.body;
+        const { status, assignedTo } = req.body;
         const issue = await Issue.findById(req.params.id);
 
         if (issue) {
-            issue.status = status;
+            const isAdmin = req.user && req.user.role === 'authority';
+            const isAssigned = issue.assignedTo && req.user && issue.assignedTo.toString() === req.user._id.toString();
+
+            if (!isAdmin && !isAssigned) {
+                return res.status(401).json({ message: 'Not authorized to update this issue status' });
+            }
+
+            if (status) issue.status = status;
+            
+            if (assignedTo !== undefined && isAdmin) {
+                issue.assignedTo = assignedTo || null;
+            }
+
             const updatedIssue = await issue.save();
-            res.status(200).json(updatedIssue);
+            
+            // Return fully populated issue to reflect the changes immediately
+            const populatedIssue = await Issue.findById(updatedIssue._id)
+                .populate('author', 'username email')
+                .populate('assignedTo', 'username email')
+                .populate('comments.user', 'username');
+
+            res.status(200).json(populatedIssue);
         } else {
             res.status(404).json({ message: 'Issue not found' });
         }

@@ -37,12 +37,16 @@ const issueSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'In Progress', 'Resolved'],
+        enum: ['Pending', 'Assigned', 'Inspect', 'In Progress', 'Resolved'],
         default: 'Pending'
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
+        ref: 'User'
+    },
+    assignedTo: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
     upvotes: [{

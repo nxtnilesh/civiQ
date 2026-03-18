@@ -5,7 +5,7 @@ import { User, Clock, CheckCircle, AlertCircle, MapPin, Star } from 'lucide-reac
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ProgressStepper = ({ status }) => {
-  const steps = ['Pending', 'In Progress', 'Resolved'];
+  const steps = ['Pending', 'Assigned', 'Inspect', 'In Progress', 'Resolved'];
   const currentIndex = Math.max(0, steps.indexOf(status));
 
   return (
