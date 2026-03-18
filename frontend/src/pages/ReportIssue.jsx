@@ -1,15 +1,28 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import { Camera, MapPin, AlertCircle, FileText } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function ReportIssue() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Roads');
   const [location, setLocation] = useState('');
+  const [position, setPosition] = useState(null);
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState('');
@@ -17,6 +30,22 @@ export default function ReportIssue() {
   
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  const handleGeolocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          setPosition(latlng);
+        },
+        (err) => {
+          setError('Unable to retrieve your location. Please check your browser permissions.');
+        }
+      );
+    } else {
+      setError('Geolocation is not supported by your browser.');
+    }
+  };
 
   if (!user) {
     return (
@@ -37,8 +66,34 @@ export default function ReportIssue() {
     }
   };
 
+  const LocationMarker = () => {
+    useMapEvents({
+      click(e) {
+        setPosition(e.latlng);
+      },
+    });
+    return position === null ? null : (
+      <Marker position={position}></Marker>
+    );
+  };
+
+  const MapUpdater = ({ center }) => {
+    const map = useMap();
+    useEffect(() => {
+      if (center) {
+        map.flyTo(center, 15);
+      }
+    }, [center, map]);
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!position) {
+      setError('Please click on the map to mark the exact location.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -59,6 +114,8 @@ export default function ReportIssue() {
         description,
         category,
         location,
+        lat: position.lat,
+        lng: position.lng,
         imageUrl
       });
 
@@ -117,7 +174,7 @@ export default function ReportIssue() {
 
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                  <MapPin className="w-4 h-4 text-primary" /> Location Details
+                  <MapPin className="w-4 h-4 text-primary" /> Text Address/Landmark
                 </label>
                 <input type="text" required className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Specific address or landmark" />
               </div>
@@ -125,13 +182,37 @@ export default function ReportIssue() {
 
             <div className="space-y-6">
               <div>
-                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                  Description
-                </label>
-                <textarea required rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none resize-none" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the issue in detail..." />
+                <div className="flex items-center justify-between mb-2">
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <MapPin className="w-4 h-4 text-primary" /> Pinpoint on Map (Required)
+                  </label>
+                  <button type="button" onClick={handleGeolocation} className="text-xs font-bold text-primary hover:text-indigo-600 bg-primary/10 px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
+                    <MapPin className="w-3 h-3" /> Use My Location
+                  </button>
+                </div>
+                <div className="h-44 rounded-xl overflow-hidden border border-gray-200 z-0 relative">
+                  <MapContainer center={[40.7128, -74.0060]} zoom={13} scrollWheelZoom={true} className="h-full w-full relative z-0">
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <LocationMarker />
+                    {position && <MapUpdater center={position} />}
+                  </MapContainer>
+                </div>
+                {!position && <p className="text-xs font-bold text-red-500 mt-2">Click on the map to drop a pin.</p>}
               </div>
 
               <div>
+                <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea required rows={3} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none resize-none" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe the issue in detail..." />
+              </div>
+
+            </div>
+          </div>
+          
+          <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                   <Camera className="w-4 h-4 text-primary" /> Photo Evidence (Optional)
                 </label>
@@ -156,8 +237,6 @@ export default function ReportIssue() {
                     )}
                   </div>
                 </div>
-              </div>
-            </div>
           </div>
 
           <div className="pt-6 border-t border-gray-100 flex justify-end">

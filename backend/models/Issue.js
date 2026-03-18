@@ -19,6 +19,14 @@ const issueSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide a location']
     },
+    lat: {
+        type: Number,
+        default: 0
+    },
+    lng: {
+        type: Number,
+        default: 0
+    },
     imageUrl: {
         type: String,
         default: ''

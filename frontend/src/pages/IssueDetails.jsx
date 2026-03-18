@@ -4,6 +4,18 @@ import { motion } from 'framer-motion';
 import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import { MapPin, Clock, MessageSquare, ThumbsUp, User, ArrowLeft, Send } from 'lucide-react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function IssueDetails() {
   const { id } = useParams();
@@ -242,13 +254,20 @@ export default function IssueDetails() {
                 <MapPin className="w-4 h-4" /> Location Map
               </h3>
             </div>
-            <div className="h-64 bg-gray-200 relative flex items-center justify-center overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=New+York,NY&zoom=14&size=400x300&sensor=false')] bg-cover bg-center opacity-40 mix-blend-multiply placeholder-map grayscale"></div>
-              <div className="z-10 flex flex-col items-center p-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg m-4 text-center border border-white/50">
-                <MapPin className="w-8 h-8 text-primary mb-2" />
-                <span className="font-bold text-gray-900">{issue.location}</span>
-                <span className="text-xs text-gray-500 mt-1">Map visualization active</span>
-              </div>
+            <div className="h-64 bg-gray-200 relative flex items-center justify-center overflow-hidden z-0">
+              {(issue.lat && issue.lng) ? (
+                <MapContainer center={[issue.lat, issue.lng]} zoom={15} scrollWheelZoom={false} className="h-full w-full relative z-0">
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker position={[issue.lat, issue.lng]} />
+                </MapContainer>
+              ) : (
+                <div className="text-gray-500 font-medium z-10 p-4 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/50 text-center">
+                  <MapPin className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  Location coordinates not provided
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

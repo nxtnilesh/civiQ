@@ -2,12 +2,25 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
-import { MapPin, Clock, MessageSquare, ThumbsUp } from 'lucide-react';
+import { MapPin, Clock, MessageSquare, ThumbsUp, Map as MapIcon, List } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function Dashboard() {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
+  const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -36,22 +49,33 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Civic Issues Explorer</h1>
           <p className="mt-2 text-gray-600">Discover and track problems reported in your community.</p>
         </div>
         
-        <div className="flex flex-wrap gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1.5">
-          {['All', 'Roads', 'Water', 'Electricity', 'Garbage', 'Others'].map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${filter === cat ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="flex flex-col sm:flex-row flex-wrap gap-4">
+            <div className="flex bg-white rounded-xl shadow-sm border border-gray-200 p-1">
+              <button onClick={() => setViewMode('list')} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${viewMode === 'list' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <List className="w-4 h-4" /> List
+              </button>
+              <button onClick={() => setViewMode('map')} className={`flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-lg transition-colors ${viewMode === 'map' ? 'bg-indigo-50 text-indigo-700' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <MapIcon className="w-4 h-4" /> Map
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1.5">
+            {['All', 'Roads', 'Water', 'Electricity', 'Garbage', 'Others'].map(cat => (
+                <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${filter === cat ? 'bg-primary text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+                >
+                {cat}
+                </button>
+            ))}
+            </div>
         </div>
       </div>
 
@@ -64,6 +88,26 @@ export default function Dashboard() {
           <h3 className="text-xl font-bold text-gray-900 mb-2">No issues found</h3>
           <p className="text-gray-500">There are no {filter !== 'All' ? filter.toLowerCase() : ''} issues reported yet.</p>
           <Link to="/report" className="mt-6 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary hover:bg-indigo-600 shadow-md hover:shadow-lg transition-all">Report an issue now</Link>
+        </div>
+      ) : viewMode === 'map' ? (
+        <div className="h-[600px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 relative z-0">
+          <MapContainer center={[40.7128, -74.0060]} zoom={12} className="h-full w-full z-0">
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+            {filteredIssues.filter(i => i.lat && i.lng).map(issue => (
+              <Marker key={issue._id} position={[issue.lat, issue.lng]}>
+                <Popup>
+                  <div className="w-48">
+                    <h3 className="font-bold text-gray-900">{issue.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{issue.location}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusColor(issue.status)}`}>{issue.status}</span>
+                        <Link to={`/issue/${issue._id}`} className="text-xs text-primary font-bold hover:underline">View Details</Link>
+                    </div>
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

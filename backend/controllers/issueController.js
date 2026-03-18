@@ -36,13 +36,15 @@ const getIssueById = async (req, res) => {
 // @access  Private
 const createIssue = async (req, res) => {
     try {
-        const { title, description, category, location, imageUrl } = req.body;
+        const { title, description, category, location, imageUrl, lat, lng } = req.body;
 
         const issue = await Issue.create({
             title,
             description,
             category,
             location,
+            lat,
+            lng,
             imageUrl,
             author: req.user._id
         });
