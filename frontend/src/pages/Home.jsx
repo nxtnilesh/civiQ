@@ -72,7 +72,7 @@ export default function Home() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 backdrop-blur-md mb-8"
           >
             <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span className="text-sm font-medium text-white tracking-wide uppercase">CivicVoice Platform is Live</span>
+            <span className="text-sm font-medium text-white tracking-wide uppercase">CiviQ Platform is Live</span>
           </motion.div>
 
           <motion.h1
@@ -124,7 +124,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20 max-w-3xl mx-auto">
             <h2 className="text-primary font-bold tracking-wide uppercase text-sm mb-2">Simple Process</h2>
-            <h3 className="text-4xl font-extrabold text-gray-900 sm:text-5xl mb-6">How CivicVoice Works</h3>
+            <h3 className="text-4xl font-extrabold text-gray-900 sm:text-5xl mb-6">How CiviQ Works</h3>
             <p className="text-xl text-gray-600 font-light leading-relaxed">Making a difference in your neighborhood has never been easier. Three simple steps to a better community.</p>
           </div>
 
@@ -222,7 +222,7 @@ export default function Home() {
           <Shield className="w-6 h-6 text-primary" />
           <span className="text-2xl font-bold text-white tracking-tight">Civic<span className="text-primary">Voice</span></span>
         </div>
-        <p>© 2026 CivicVoice Platform. Built for the community.</p>
+        <p>© 2026 CiviQ Platform. Built for the community.</p>
       </footer>
     </div>
   );

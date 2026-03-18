@@ -26,7 +26,7 @@ const Navbar = () => {
               >
                 <HelpCircle size={32} strokeWidth={2.5} />
               </motion.div>
-              <span className="font-bold text-xl tracking-tight text-gray-900">Civic<span className="text-primary">Voice</span></span>
+              <span className="font-bold text-xl tracking-tight text-gray-900">Civi<span className="text-primary">Q</span></span>
             </Link>
           </div>
           <div className="flex items-center space-x-6">
