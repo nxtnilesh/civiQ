@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import api from '../api/axios';
 import { MapPin, Clock, MessageSquare, ThumbsUp, Map as MapIcon, List } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -47,6 +48,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -61,6 +64,22 @@ export default function Dashboard() {
     };
     fetchIssues();
   }, []);
+
+  const handleSupport = async (e, issueId) => {
+    e.preventDefault();
+    if (!user) {
+      alert('Please log in or sign up to support an issue!');
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      const { data } = await api.put(`/issues/${issueId}/upvote`);
+      setIssues(issues.map(issue => issue._id === issueId ? data : issue));
+    } catch (error) {
+      console.error('Error upvoting', error);
+    }
+  };
 
   const filteredIssues = filter === 'All' ? issues : issues.filter(issue => issue.category === filter);
 
@@ -184,9 +203,12 @@ export default function Dashboard() {
                 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
                   <div className="flex gap-4">
-                    <div className="flex items-center gap-1.5 text-gray-500 text-sm font-medium">
-                      <ThumbsUp className="w-4 h-4" /> {issue.upvotes?.length || 0}
-                    </div>
+                    <button 
+                      onClick={(e) => handleSupport(e, issue._id)}
+                      className={`flex items-center gap-1.5 text-sm font-bold transition-colors hover:scale-105 active:scale-95 ${user && issue.upvotes.includes(user._id) ? 'text-secondary' : 'text-gray-500 hover:text-green-600'}`}
+                    >
+                      <ThumbsUp className={`w-4 h-4 ${user && issue.upvotes.includes(user._id) ? 'fill-secondary' : ''}`} /> {issue.upvotes?.length || 0}
+                    </button>
                     <div className="flex items-center gap-1.5 text-gray-500 text-sm font-medium">
                       <MessageSquare className="w-4 h-4" /> {issue.comments?.length || 0}
                     </div>
