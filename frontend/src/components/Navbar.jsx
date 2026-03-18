@@ -31,10 +31,11 @@ export default function Navbar() {
               {user ? (
                 <>
                   <Link to="/report" className={`font-medium text-sm transition-colors ${isActive('/report') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Report Issue</Link>
+                  <Link to="/profile" className={`font-medium text-sm transition-colors ${isActive('/profile') ? 'text-primary' : 'text-gray-500 hover:text-gray-900'}`}>Profile</Link>
                   <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
-                    <Link to="/profile" className="text-sm font-bold text-primary hover:text-green-700 bg-primary-50 hover:bg-primary-100 px-3 py-1.5 rounded-full border border-primary-200 transition-colors">
+                    <span className="text-sm font-bold text-primary bg-primary-50 px-3 py-1.5 rounded-full border border-primary-200">
                       {user.username}
-                    </Link>
+                    </span>
                     <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-700 flex items-center gap-1 transition-colors">
                       <LogOut className="w-4 h-4" /> Logout
                     </button>
