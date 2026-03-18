@@ -13,11 +13,15 @@ const issueSchema = new mongoose.Schema({
     category: {
         type: String,
         required: [true, 'Please select a category'],
-        enum: ['Roads', 'Water', 'Electricity', 'Garbage', 'Others']
+        enum: ['Roads & Transit', 'Water & Sanitation', 'Electricity', 'Waste Management', 'Public Safety', 'Other Issues', 'Roads', 'Water', 'Garbage', 'Others'] // Kept old ones for backward compatibility just in case
+    },
+    subCategory: {
+        type: String,
+        default: 'General'
     },
     location: {
         type: String,
-        required: [true, 'Please provide a location']
+        required: false
     },
     lat: {
         type: Number,

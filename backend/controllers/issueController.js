@@ -36,13 +36,14 @@ const getIssueById = async (req, res) => {
 // @access  Private
 const createIssue = async (req, res) => {
     try {
-        const { title, description, category, location, imageUrl, lat, lng } = req.body;
+        const { title, description, category, subCategory, location, imageUrl, lat, lng } = req.body;
 
         const issue = await Issue.create({
             title,
             description,
             category,
-            location,
+            subCategory,
+            location: location || 'Location Not Specified',
             lat,
             lng,
             imageUrl,
